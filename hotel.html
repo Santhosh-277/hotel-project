@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Menu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            color: #667eea;
+            font-size: 2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        nav a:hover {
+            background: #f0f0f0;
+        }
+
+        main {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .menu-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .menu-section h2 {
+            margin-bottom: 1.5rem;
+            color: #667eea;
+            font-size: 1.8rem;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .menu-item {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu-item-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .menu-item-info {
+            padding: 1rem;
+        }
+
+        .menu-item-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .menu-item-price {
+            font-size: 1.1rem;
+            color: #667eea;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .add-to-cart-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .add-to-cart-btn:hover {
+            background: #5568d3;
+        }
+
+        .cart-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .cart-section h2 {
+            margin-bottom: 1.5rem;
+            color: #667eea;
+            font-size: 1.8rem;
+        }
+
+        .cart-items {
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-cart {
+            text-align: center;
+            color: #999;
+            padding: 2rem;
+            font-style: italic;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .cart-item-price {
+            color: #667eea;
+            font-size: 0.9rem;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quantity-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .cart-item-quantity {
+            font-weight: 600;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .cart-item-total {
+            font-weight: 700;
+            color: #667eea;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .cart-summary {
+            border-top: 2px solid #eee;
+            padding-top: 1.5rem;
+        }
+
+        .total-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .total-label {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .total-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .cart-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #c82333;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .qr-container {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .qr-container img {
+            width: 300px;
+            height: 300px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .order-summary-modal {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #eee;
+        }
+
+        .order-summary-modal h3 {
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .modal-order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-total {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid #667eea;
+            text-align: right;
+            font-size: 1.2rem;
+        }
+
+        .print-bill {
+            display: none;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            .print-bill,
+            .print-bill * {
+                visibility: visible;
+            }
+
+            .print-bill {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white;
+                padding: 2rem;
+            }
+
+            .bill-header {
+                text-align: center;
+                margin-bottom: 2rem;
+                border-bottom: 2px solid #333;
+                padding-bottom: 1rem;
+            }
+
+            .bill-header h1 {
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .bill-items table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 2rem 0;
+            }
+
+            .bill-items th,
+            .bill-items td {
+                padding: 0.75rem;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .bill-items th {
+                background: #f8f9fa;
+                font-weight: 600;
+            }
+
+            .bill-footer {
+                margin-top: 2rem;
+                padding-top: 1rem;
+                border-top: 2px solid #333;
+            }
+
+            .bill-total {
+                text-align: right;
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+        }
+
+        footer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+            color: #666;
+        }
+
+        @media (max-width: 1024px) {
+            main {
+                grid-template-columns: 1fr;
+                padding: 0 1rem;
+            }
+
+            .cart-section {
+                position: static;
+                margin-top: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            header h1 {
+                font-size: 1.5rem;
+            }
+
+            main {
+                margin: 1rem auto;
+                padding: 0 1rem;
+                gap: 1.5rem;
+            }
+
+            .menu-section,
+            .cart-section {
+                padding: 1.5rem;
+            }
+
+            .menu-section h2,
+            .cart-section h2 {
+                font-size: 1.5rem;
+            }
+
+            .menu-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 1rem;
+            }
+
+            .menu-item-image {
+                height: 120px;
+            }
+
+            .menu-item-info {
+                padding: 0.75rem;
+            }
+
+            .menu-item-name {
+                font-size: 1rem;
+            }
+
+            .menu-item-price {
+                font-size: 1rem;
+            }
+
+            .add-to-cart-btn {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            .cart-items {
+                max-height: 300px;
+            }
+
+            .cart-item {
+                flex-wrap: wrap;
+                padding: 0.75rem;
+            }
+
+            .cart-item-info {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            .cart-item-controls {
+                order: 2;
+            }
+
+            .cart-item-total {
+                order: 3;
+                min-width: auto;
+                text-align: left;
+                margin-left: auto;
+            }
+
+            .total-section {
+                padding: 0.75rem;
+            }
+
+            .total-label {
+                font-size: 1.1rem;
+            }
+
+            .total-amount {
+                font-size: 1.3rem;
+            }
+
+            .btn {
+                padding: 0.65rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .cart-actions {
+                gap: 0.75rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+                margin: 10% auto;
+            }
+
+            .qr-container img {
+                width: 250px;
+                height: 250px;
+            }
+
+            footer {
+                padding: 1.5rem 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.3rem;
+            }
+
+            .menu-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .menu-item-image {
+                height: 180px;
+            }
+
+            .cart-section {
+                padding: 1rem;
+            }
+
+            .total-amount {
+                font-size: 1.2rem;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 0.75rem;
+            }
+
+            .modal-content {
+                padding: 1rem;
+            }
+
+            .qr-container img {
+                width: 200px;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Santhosh Restaurant</h1>
+        <nav>
+            <a href="admin.html">Admin</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="menu-section">
+            <h2>Our Menu</h2>
+            <div id="menu-container" class="menu-grid">
+                <!-- Menu items will be dynamically loaded here -->
+            </div>
+        </section>
+
+        <aside class="cart-section">
+            <h2>Your Cart</h2>
+            <div id="cart-items" class="cart-items">
+                <p class="empty-cart">Your cart is empty</p>
+            </div>
+            <div class="cart-summary">
+                <div class="total-section">
+                    <span class="total-label">Total:</span>
+                    <span id="cart-total" class="total-amount">₹0</span>
+                </div>
+                <div class="cart-actions">
+                    <button id="pay-now-btn" class="btn btn-primary" disabled>Pay Now</button>
+                    <button id="print-bill-btn" class="btn btn-secondary" disabled>Print Bill</button>
+                    <button id="clear-cart-btn" class="btn btn-danger" disabled>Clear Cart</button>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- QR Code Modal -->
+    <div id="qr-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Payment</h2>
+            <div class="qr-container">
+                <img src="https://via.placeholder.com/300x300?text=QR+Code" alt="QR Code" id="qr-code-image">
+                <p>Scan the QR code to complete your payment</p>
+            </div>
+            <div class="order-summary-modal">
+                <h3>Order Summary</h3>
+                <div id="modal-order-items"></div>
+                <div class="modal-total">
+                    <strong>Total: <span id="modal-total-amount">₹0</span></strong>
+                </div>
+            </div>
+            <button id="confirm-payment-btn" class="btn btn-primary">Confirm Payment</button>
+        </div>
+    </div>
+
+    <!-- Print Bill Container -->
+    <div id="print-bill" class="print-bill">
+        <div class="bill-header">
+            <h1>Restaurant</h1>
+            <p>Order #<span id="bill-order-id"></span></p>
+            <p>Date: <span id="bill-date"></span></p>
+        </div>
+        <div class="bill-items">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="bill-items-body">
+                </tbody>
+            </table>
+        </div>
+        <div class="bill-footer">
+            <div class="bill-total">
+                <strong>Grand Total: ₹<span id="bill-total-amount">0</span></strong>
+            </div>
+            <p>Thank you for your visit!</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Restaurant. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Initialize cart
+        let cart = [];
+
+        // Load menu items from localStorage
+        function loadMenuItems() {
+            const menuItems = JSON.parse(localStorage.getItem('menuItems')) || [];
+            const menuContainer = document.getElementById('menu-container');
+            
+            if (menuItems.length === 0) {
+                menuContainer.innerHTML = '<p>No menu items available. Please add items from admin panel.</p>';
+                return;
+            }
+            
+            menuContainer.innerHTML = menuItems.map(item => `
+                <div class="menu-item" data-id="${item.id}">
+                    <img src="${item.image}" alt="${item.name}" class="menu-item-image" onerror="this.src='https://via.placeholder.com/200x150?text=${encodeURIComponent(item.name)}'">
+                    <div class="menu-item-info">
+                        <div class="menu-item-name">${item.name}</div>
+                        <div class="menu-item-price">₹${item.price.toFixed(2)}</div>
+                        <button class="add-to-cart-btn" onclick="addToCart('${item.id}')">Add to Cart</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Add item to cart
+        function addToCart(itemId) {
+            const menuItems = JSON.parse(localStorage.getItem('menuItems')) || [];
+            const item = menuItems.find(m => m.id === itemId);
+            
+            if (!item) return;
+            
+            const existingItem = cart.find(c => c.id === itemId);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    quantity: 1
+                });
+            }
+            
+            updateCartDisplay();
+            saveCart();
+        }
+
+        // Remove item from cart
+        function removeFromCart(itemId) {
+            cart = cart.filter(item => item.id !== itemId);
+            updateCartDisplay();
+            saveCart();
+        }
+
+        // Update item quantity in cart
+        function updateQuantity(itemId, change) {
+            const item = cart.find(c => c.id === itemId);
+            if (!item) return;
+            
+            item.quantity += change;
+            
+            if (item.quantity <= 0) {
+                removeFromCart(itemId);
+            } else {
+                updateCartDisplay();
+                saveCart();
+            }
+        }
+
+        // Update cart display
+        function updateCartDisplay() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
+                cartTotal.textContent = '₹0';
+                document.getElementById('pay-now-btn').disabled = true;
+                document.getElementById('print-bill-btn').disabled = true;
+                document.getElementById('clear-cart-btn').disabled = true;
+                return;
+            }
+            
+            cartItemsContainer.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-price">₹${item.price.toFixed(2)} each</div>
+                    </div>
+                    <div class="cart-item-controls">
+                        <button class="quantity-btn" onclick="updateQuantity('${item.id}', -1)">-</button>
+                        <span class="cart-item-quantity">${item.quantity}</span>
+                        <button class="quantity-btn" onclick="updateQuantity('${item.id}', 1)">+</button>
+                    </div>
+                    <div class="cart-item-total">₹${(item.price * item.quantity).toFixed(2)}</div>
+                    <button class="quantity-btn" onclick="removeFromCart('${item.id}')" title="Remove">×</button>
+                </div>
+            `).join('');
+            
+            cartTotal.textContent = `₹${total.toFixed(2)}`;
+            document.getElementById('pay-now-btn').disabled = false;
+            document.getElementById('print-bill-btn').disabled = false;
+            document.getElementById('clear-cart-btn').disabled = false;
+        }
+
+        // Clear cart
+        function clearCart() {
+            if (cart.length === 0) return;
+            
+            if (confirm('Are you sure you want to clear the cart?')) {
+                cart = [];
+                updateCartDisplay();
+                localStorage.removeItem('currentCart');
+            }
+        }
+
+        // Save cart to localStorage
+        function saveCart() {
+            localStorage.setItem('currentCart', JSON.stringify(cart));
+        }
+
+        // Load cart from localStorage
+        function loadCart() {
+            const savedCart = localStorage.getItem('currentCart');
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+                updateCartDisplay();
+            }
+        }
+
+        // Calculate total
+        function calculateTotal() {
+            return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        }
+
+        // Open QR code modal
+        function openQRModal() {
+            const modal = document.getElementById('qr-modal');
+            const modalOrderItems = document.getElementById('modal-order-items');
+            const modalTotalAmount = document.getElementById('modal-total-amount');
+            const total = calculateTotal();
+            
+            modalOrderItems.innerHTML = cart.map(item => `
+                <div class="modal-order-item">
+                    <span>${item.name} x${item.quantity}</span>
+                    <span>₹${(item.price * item.quantity).toFixed(2)}</span>
+                </div>
+            `).join('');
+            
+            modalTotalAmount.textContent = `₹${total.toFixed(2)}`;
+            modal.style.display = 'block';
+        }
+
+        // Close QR code modal
+        function closeQRModal() {
+            const modal = document.getElementById('qr-modal');
+            modal.style.display = 'none';
+        }
+
+        // Confirm payment and save order
+        function confirmPayment() {
+            const total = calculateTotal();
+            const orderId = 'ORD-' + Date.now();
+            const order = {
+                id: orderId,
+                items: [...cart],
+                total: total,
+                date: new Date().toLocaleDateString(),
+                timestamp: new Date().toISOString()
+            };
+            
+            // Save order to localStorage
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            orders.push(order);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            
+            // Clear cart
+            cart = [];
+            updateCartDisplay();
+            localStorage.removeItem('currentCart');
+            
+            // Close modal
+            closeQRModal();
+            
+            // Show success message
+            alert('Payment confirmed! Order #' + orderId + ' has been placed. Thank you!');
+        }
+
+        // Print bill
+        function printBill() {
+            const billContainer = document.getElementById('print-bill');
+            const billOrderId = document.getElementById('bill-order-id');
+            const billDate = document.getElementById('bill-date');
+            const billItemsBody = document.getElementById('bill-items-body');
+            const billTotalAmount = document.getElementById('bill-total-amount');
+            const total = calculateTotal();
+            
+            // Generate order ID
+            const orderId = 'ORD-' + Date.now();
+            billOrderId.textContent = orderId;
+            billDate.textContent = new Date().toLocaleString();
+            
+            // Populate bill items
+            billItemsBody.innerHTML = cart.map(item => `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${item.quantity}</td>
+                    <td>₹${item.price.toFixed(2)}</td>
+                    <td>₹${(item.price * item.quantity).toFixed(2)}</td>
+                </tr>
+            `).join('');
+            
+            billTotalAmount.textContent = total.toFixed(2);
+            
+            // Show bill container and print
+            billContainer.style.display = 'block';
+            window.print();
+            billContainer.style.display = 'none';
+        }
+
+        // Initialize default menu items if none exist
+        function initializeDefaultMenu() {
+            const menuItems = JSON.parse(localStorage.getItem('menuItems'));
+            
+            if (!menuItems || menuItems.length === 0) {
+                const defaultMenu = [
+                    { id: '1', name: 'Idly', price: 30.00, image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fHRlYXxlbnwwfHwwfHx8MA%3D%3D' },
+                    { id: '2', name: 'Puttu', price: 40.00, image: 'https://images.unsplash.com/photo-1633613286991-611fe299c4be?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80' },
+                    { id: '3', name: 'Poori', price: 35.00, image: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80' },
+                    { id: '4', name: 'Coffee', price: 15.00, image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80' },
+                    { id: '5', name: 'Dosai', price: 45.00, image: 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80' },
+                    { id: '6', name: 'Vada', price: 25.00, image: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80' },
+                    { id: '7', name: 'Tea', price: 12.00, image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80' }
+                ];
+                
+                localStorage.setItem('menuItems', JSON.stringify(defaultMenu));
+            }
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize default menu first
+            initializeDefaultMenu();
+            
+            // Load menu and cart on page load
+            loadMenuItems();
+            loadCart();
+            
+            // Pay Now button
+            document.getElementById('pay-now-btn').addEventListener('click', openQRModal);
+            
+            // Print Bill button
+            document.getElementById('print-bill-btn').addEventListener('click', printBill);
+            
+            // Clear Cart button
+            document.getElementById('clear-cart-btn').addEventListener('click', clearCart);
+            
+            // Confirm Payment button
+            document.getElementById('confirm-payment-btn').addEventListener('click', confirmPayment);
+            
+            // Close modal on X click
+            document.querySelector('.close').addEventListener('click', closeQRModal);
+            
+            // Close modal on outside click
+            window.addEventListener('click', (event) => {
+                const modal = document.getElementById('qr-modal');
+                if (event.target === modal) {
+                    closeQRModal();
+                }
+            });
+            
+            // Refresh menu when localStorage changes (for admin updates)
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'menuItems') {
+                    loadMenuItems();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
